@@ -7,6 +7,7 @@ using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
+using Windows.Storage;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
@@ -32,6 +33,30 @@ namespace PhotoViewer
             this.Suspending += OnSuspending;
         }
 
+        protected override async void OnFileActivated(FileActivatedEventArgs args)
+        {
+            // TODO: Handle file activation
+
+            // The number of files received is args.Files.Size
+            // The first file is args.Files[0].Name
+            Frame rootFrame = CreateFrame();
+
+            if (rootFrame.Content == null)
+            {
+                if (!rootFrame.Navigate(typeof(MainPage)))
+                {
+                    throw new Exception("Failed to create initial page");
+                }
+            }
+
+            var p = rootFrame.Content as MainPage;
+            StorageFile file = await StorageFile.GetFileFromPathAsync(args.Files[0].Path);
+            p.OpenFile(file);
+
+            // Ensure the current window is active 
+            Window.Current.Activate();
+        }
+
         /// <summary>
         /// Invoked when the application is launched normally by the end user.  Other entry points
         /// will be used such as when the application is launched to open a specific file.
@@ -39,25 +64,7 @@ namespace PhotoViewer
         /// <param name="e">Details about the launch request and process.</param>
         protected override void OnLaunched(LaunchActivatedEventArgs e)
         {
-            Frame rootFrame = Window.Current.Content as Frame;
-
-            // Do not repeat app initialization when the Window already has content,
-            // just ensure that the window is active
-            if (rootFrame == null)
-            {
-                // Create a Frame to act as the navigation context and navigate to the first page
-                rootFrame = new Frame();
-
-                rootFrame.NavigationFailed += OnNavigationFailed;
-
-                if (e.PreviousExecutionState == ApplicationExecutionState.Terminated)
-                {
-                    //TODO: Load state from previously suspended application
-                }
-
-                // Place the frame in the current Window
-                Window.Current.Content = rootFrame;
-            }
+            Frame rootFrame = CreateFrame();
 
             if (e.PrelaunchActivated == false)
             {
@@ -71,6 +78,26 @@ namespace PhotoViewer
                 // Ensure the current window is active
                 Window.Current.Activate();
             }
+        }
+
+        Frame CreateFrame()
+        {
+            Frame rootFrame = Window.Current.Content as Frame;
+
+            // Do not repeat app initialization when the Window already has content,
+            // just ensure that the window is active
+            if (rootFrame == null)
+            {
+                // Create a Frame to act as the navigation context and navigate to the first page
+                rootFrame = new Frame();
+
+                rootFrame.NavigationFailed += OnNavigationFailed;
+
+
+                // Place the frame in the current Window
+                Window.Current.Content = rootFrame;
+            }
+            return rootFrame;
         }
 
         /// <summary>

@@ -32,6 +32,21 @@ namespace PhotoViewer
             this.InitializeComponent();
         }
 
+        public async void OpenFile(StorageFile file)
+        {
+            caption.Text = $"Viewing {file.DisplayName}";
+            await photoViewer.ShowImage(file);
+            using (var stream = await file.OpenStreamForReadAsync())
+            {
+                DataSource.Clear();
+                var elementNode = MetadataHandler.LoadMetadata(stream);
+                if (elementNode != null)
+                {
+                    DataSource.Add(elementNode);
+                }
+            }
+        }
+
         private async void Load_Click(object sender, RoutedEventArgs e)
         {
             FileOpenPicker openPicker = new FileOpenPicker();
@@ -43,17 +58,7 @@ namespace PhotoViewer
             StorageFile file = await openPicker.PickSingleFileAsync();
             if (file != null)
             {
-                caption.Text = $"Viewing {file.DisplayName}";
-                await photoViewer.ShowImage(file);
-                using (var stream = await file.OpenStreamForReadAsync())
-                {
-                    DataSource.Clear();
-                    var elementNode = MetadataHandler.LoadMetadata(stream);
-                    if (elementNode != null)
-                    {
-                        DataSource.Add(elementNode);
-                    }
-                }
+                OpenFile(file);
             }
         }
 
