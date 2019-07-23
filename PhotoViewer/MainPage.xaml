@@ -1,0 +1,52 @@
+﻿<Page
+    x:Class="PhotoViewer.MainPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:PhotoViewer"
+    xmlns:en="using ElementNode"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:muxc="using:Windows.UI.Xaml.Controls"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <CommandBar DefaultLabelPosition="Right" Grid.Row="0" OverflowButtonVisibility="Collapsed">
+            <AppBarButton Icon="OpenFile" Label="Open image file" Click="Load_Click" IsCompact="False"/>
+            <AppBarToggleButton Icon="OpenPane" Label="Hide Accessibility Tree" Click="AppBarToggleButton_Click" IsCompact="False"/>
+            <CommandBar.Content>
+                <TextBlock x:Name="caption" Text="no image selected" Margin="12,14" Style="{StaticResource BaseTextBlockStyle}"/>
+            </CommandBar.Content>
+        </CommandBar>
+        <SplitView Grid.Row="1" IsTabStop="False" x:Name="splitView" PaneBackground="{ThemeResource SystemControlBackgroundChromeMediumLowBrush}"
+           IsPaneOpen="True" OpenPaneLength="312" CompactPaneLength="48" DisplayMode="Inline" PanePlacement="Right">
+            <SplitView.Pane>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <TextBlock Grid.Row="0" Text="Accessibility Tree" x:Name="PaneHeader" Margin="12" HorizontalAlignment="Center" Style="{StaticResource BaseTextBlockStyle}"/>
+                    <ScrollViewer Grid.Row="1">
+                        <muxc:TreeView   x:Name="treeView" AutomationProperties.Name="Accessibility tree"
+                            SelectionMode="None"
+                            ItemsSource="{x:Bind DataSource}">
+                            <muxc:TreeView.ItemTemplate>
+                                <DataTemplate>
+                                    <muxc:TreeViewItem
+                            ItemsSource="{Binding Children}"
+                            Content="{Binding DisplayContent}"/>
+                                </DataTemplate>
+                            </muxc:TreeView.ItemTemplate>
+                        </muxc:TreeView>
+                    </ScrollViewer>
+                </Grid>
+            </SplitView.Pane>
+            <local:PhotoView x:Name="photoViewer" Grid.Column="0"></local:PhotoView>
+        </SplitView>
+    </Grid>
+</Page>
