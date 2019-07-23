@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
@@ -25,7 +26,12 @@ namespace PhotoViewer
     /// </summary>
     public sealed partial class MainPage : Page
     {
-        private ObservableCollection<ElementNode> DataSource = new ObservableCollection<ElementNode>();
+        private static ElementNode DefaultNode = new ElementNode()
+        {
+            Name = "No accessibility information available"
+        };
+        private ObservableCollection<ElementNode> DataSource = 
+            new ObservableCollection<ElementNode>(new List<ElementNode>() { DefaultNode });
 
         public MainPage()
         {
@@ -38,10 +44,12 @@ namespace PhotoViewer
             await photoViewer.ShowImage(file);
             using (var stream = await file.OpenStreamForReadAsync())
             {
-                DataSource.Clear();
+                this.DataSource.Clear();
+                this.DataSource.Add(DefaultNode);
                 var elementNode = MetadataHandler.LoadMetadata(stream);
                 if (elementNode != null)
                 {
+                    DataSource.Clear();
                     DataSource.Add(elementNode);
                 }
             }
